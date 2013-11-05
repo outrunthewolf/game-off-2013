@@ -77,7 +77,7 @@ var Zombie =
 
 		// Create a new Zombie
 		var z = new createjs.Shape();
-		z.graphics.beginFill("red").drawRect(0, 0, 4, 4);
+		z.graphics.beginFill("#309400").drawRect(0, 0, 5, 5);
 		
 		// Make some random positions
 		var x = Math.floor((Math.random() * Main.stage.canvas.width) + 1);
@@ -99,7 +99,7 @@ var Zombie =
 			var posy = Zombie.stage.mouseY;
 
 			// Move zombie
-			Zombie.move(z, posx, posy, 1);
+			Zombie.move(z, posx, posy, n);
 		});
 
 		// Mouse event for reset
@@ -111,26 +111,19 @@ var Zombie =
 
 	move: function(zombie, posx, posy, speed)
 	{
+		speed = ((speed + 1) / 7);
 
 		if(zombie.x > posx)
-		{
-			--zombie.x * speed;
-		}
-
+			zombie.x = (zombie.x - speed);
+		
 		if(zombie.y > posy)
-		{
-			--zombie.y * speed
-		}
-
+			zombie.y = (zombie.y - speed);
+		
 		if(zombie.y < posy)
-		{
-			++zombie.y * speed
-		}
-
+			zombie.y = (zombie.y + speed);
+		
 		if(zombie.x < posx)
-		{
-			++zombie.x * speed
-		}
+			zombie.x = (zombie.x + speed);
 
 		Zombie.stage.update();
 	},
