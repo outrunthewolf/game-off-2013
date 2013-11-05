@@ -1,0 +1,23 @@
+/**
+*	Various Styles
+**/
+body
+{
+	background: #000;
+}
+
+#stage
+{
+	width: 300px;
+	margin: 0px auto;
+	padding: 10px;
+}
+
+#stage canvas
+{
+	position: absolute;
+	top: 0px;
+	height: 150px;
+	background: #333;
+	margin-top: 100px;
+}
