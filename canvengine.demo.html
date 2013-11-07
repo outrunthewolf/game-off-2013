@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvengine</title>
+    <style>
+    * { margin: 0; padding: 0; position: relative; }
+    html, body {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+    }
+    canvas { background: #000; }
+    #canvengine-debugger {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background: rgba(0, 0, 0, .9);
+        padding: 5px;
+        font-family: Courier New;
+        font-size: 12px;
+        color: #fff;
+    }
+    #game {
+        width: 640px;
+        height: 480px;
+        margin: 0 auto;
+    }
+    </style>
+    <script src="lib/canvengine/Core.js"></script>
+    <script src="lib/canvengine/Function.js"></script>
+    <script src="lib/canvengine/Array.js"></script>
+    <script src="lib/canvengine/BaseClass.js"></script>
+    <script src="lib/canvengine/Events.js"></script>
+    <script src="lib/canvengine/DisplayObject.js"></script>
+    <script src="lib/canvengine/DisplayObjectContainer.js"></script>
+    <script src="lib/canvengine/Sprite.js"></script>
+    <script src="lib/canvengine/TextField.js"></script>
+    <script src="lib/canvengine/Ship.js"></script>
+    <script src="lib/canvengine/Bullet.js"></script>
+    <script src="lib/canvengine/Canvengine.js"></script>
+    <script>
+    var Game
+        ,worldBounds = [[0, 5000], [0, 5000]]
+        ,dotCount = 100
+        ,HUD
+        ;
+    addEventListener('load', function() {
+
+        // Create Board
+        var gw = document.getElementById('game').clientWidth; // document.body.clientWidth
+        var gh = document.getElementById('game').clientWidth; // document.body.clientHeight
+        var fullscreen = false;
+        Game = new Canvengine({
+            width: gw,
+            height: gh,
+            container: 'game',
+            fps: 100
+        });
+        function resizeGame() {
+            var bw = document.body.clientWidth;
+            var bh = document.body.clientHeight;
+            if (!fullscreen) {
+                Game.buildStage(Math.min(bw, gw), Math.min(bh, gh));
+            } else {
+                Game.buildStage(bw, bh);
+            }
+            document.getElementById('game').style.marginTop = (bh / 2 - Game.height / 2) + 'px';
+            document.getElementById('game').style.marginLeft = (bw / 2 - Game.width / 2) + 'px';
+        }
+        addEventListener('resize', resizeGame);
+        resizeGame();
+
+        // Create Player
+        var player = new Ship();
+        player.x = 150;
+        player.y = 150;
+        player.width = 150;
+        player.height = 150;
+        player.setSourceFromUrl('assets/images/ship.png');
+        player.color = "rgba(0, 127, 0, 0)";
+        player.rotation = 0;
+        player.bounds = worldBounds;
+        Game.player = player;
+        Game.stage.addChild(player);
+
+        function toggleFullscreen() {
+            fullscreen = !fullscreen;
+            resizeGame();
+        }
+
+        // Events
+        Game.onEvent('keydown', function(e) {
+//          console.log(e);
+            if (e.keyCode == 70) toggleFullscreen();
+            this.keyDown[e.keyCode] = true;
+        });
+        Game.onEvent('keyup', function(e) {
+            this.keyDown[e.keyCode] = false;
+        });
+        Game.onEvent('mousemove', function(e) {
+
+        });
+
+        // Create Random Circles
+        var dots = [];
+        for (var i = 0, l = dotCount; i < l; i++) {
+            var dot = new DisplayObject();
+            dot.x = Math.round(Math.random() * worldBounds[0][1]);
+            dot.y = Math.round(Math.random() * worldBounds[1][1]);
+            var s = Math.round(Math.random() * 5) + 15;
+            dot.width = s;
+            dot.height = s;
+            dot.speed = Math.round(Math.random()) / 4;
+//          dot.color = ['#ff0000', '#000000', '#009900'][Math.round(Math.random() * 2)];
+            dot.color = "rgba(255, 255, 255, .5)";
+            dot.dirX = Math.random() > .5 ? 1 : -1;
+            dot.dirY = Math.random() > .5 ? 1 : -1;
+            dot.bounds = worldBounds;
+            dots.push(dot);
+            Game.stage.addChild(dot);
+        }
+
+        // HUD
+        HUD = new DisplayObjectContainer();
+        HUD.x = 0;
+        HUD.y = 0;
+        HUD.width = Game.width;
+        HUD.height = Game.height;
+        Game.stage.addChild(HUD);
+        var HealthMeter = new TextField();
+        HealthMeter.x = 20;
+        HealthMeter.y = 20;
+        HealthMeter.text = 'Health: 100';
+        HealthMeter.color = '#ffffff';
+        HUD.addChild(HealthMeter);
+
+        // Apply
+        var img = new Image();
+        img.onload = function() {
+            Game.stage.background = img;
+        }
+        img.src = 'assets/images/stars.png';
+
+        // Calculate Game Logic
+        Game.onEvent('enterframe', function() {
+
+            //
+            HUD.x = 0 - Game.stage.offsetX;
+            HUD.y = 0 - Game.stage.offsetY;
+
+            // Player Controls
+            if (this.keyDown[37]) this.player.rotation -= 5;
+            if (this.keyDown[39]) this.player.rotation += 5;
+            if (this.keyDown[38]) this.player.speed += 1;
+            if (this.keyDown[40]) this.player.speed *= .95;
+            if (this.keyDown[32]) this.player.shoot();
+
+            // Stage Controls
+            if (this.keyDown[87]) this.stage.offsetY += 10;
+            if (this.keyDown[83]) this.stage.offsetY -= 10;
+            if (this.keyDown[65]) this.stage.offsetX += 10;
+            if (this.keyDown[68]) this.stage.offsetX -= 10;
+
+            this.player.speed *= this.player._deccel;
+            this.player.speedX = Math.round(Math.cos(this.player.rotation * (Math.PI / 180)) * this.player.speed * -1);
+            this.player.speedY = Math.round(Math.sin(this.player.rotation * (Math.PI / 180)) * this.player.speed);
+            this.player.x -= this.player.speedX;
+            this.player.y += this.player.speedY;
+
+            //
+            if (this.player.x < (0 - this.stage.offsetX) + 100) this.stage.offsetX += this.player.speedX;
+            if (this.player.x > (this.width - this.stage.offsetX) - 100) this.stage.offsetX += this.player.speedX;
+            if (this.player.y < (0 - this.stage.offsetY) + 100) this.stage.offsetY -= this.player.speedY;
+            if (this.player.y > (this.height - this.stage.offsetY) - 100) this.stage.offsetY -= this.player.speedY;
+
+            // Loop Through Dots
+            for (var i = 0, l = dots.length; i < l; i++) {
+                var dot = dots[i];
+                if (!dot) continue;
+                if (!dot.alive) continue;
+
+                var s = dot.speed + baseSpeed
+                dot.x += dot.dirX * s;
+                dot.y += dot.dirY * s;
+                dot.rotation += 1;
+
+                if (dot.x < dot.bounds[0][0] + (dot.width / 2)) { dot.dirX = s; dot.dirY = 0 - dot.dirY; }
+                if (dot.x > dot.bounds[0][1] - (dot.width / 2)) { dot.dirX = -s; dot.dirY = 0 - dot.dirY; }
+                if (dot.y < dot.bounds[1][0] + (dot.height / 2)) { dot.dirY = s; dot.dirX = 0 - dot.dirX; }
+                if (dot.y > dot.bounds[1][1] - (dot.height / 2)) { dot.dirY = -s; dot.dirX = 0 - dot.dirX; }
+
+                var hitPlayer = dot.hitTest(player);
+                if (hitPlayer) {
+                    dot.dirX = player.x > dot.x ? 0 - s : s;
+                    dot.dirY = player.y > dot.y ? 0 - s : s;
+                }
+
+                // Loop Through Players bullets
+                for (var i3 = 0, l3 = this.player.bullets.length; i3 < l3; i3++) {
+                    var b = this.player.bullets[i3];
+                    if (!b) continue;
+                    if (b.hitTest(dot)) {
+                        b.destroy();
+                        dot.destroy();
+                        dots.splice(i, 1);
+                        this.player.bullets.splice(i3, 1);
+                    }
+                }
+
+
+            }
+
+        });
+
+    });
+    var speed = 5;
+    var baseSpeed = 1;
+    </script>
+</head>
+<body>
+
+<div id="game"></div>
+
+</body>
+</html>
