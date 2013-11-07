@@ -1,5 +1,5 @@
 var Game
-    ,worldBounds = [[0, 5000], [0, 5000]]
+    ,worldBounds = [[0, 2000], [0, 2000]]
     ,dotCount = 100
     ,HUD
     ,fullscreen = true
@@ -46,11 +46,11 @@ Game.stage.addChild(player);
 var enemies = [];
 for (var i = 0; i < 5; i++) {
     var enemy = new Zombie();
-    enemy.width = 150;
-    enemy.height = 300;
+    enemy.width = 32;
+    enemy.height = 32;
     enemy.x = Math.random() * worldBounds[0][1];
     enemy.y = Math.random() * worldBounds[1][1];
-    enemy.setSourceFromUrl('assets/images/zombie.gif');
+//    enemy.setSourceFromUrl('assets/images/zombie.gif');
     enemy.color = "rgba(127, 0, 0, 200)";
     enemy.rotation = 0;
     enemy.bounds = worldBounds;
@@ -120,11 +120,17 @@ Game.onEvent('enterframe', function() {
     this.player.y += this.player.speedY;
 
     // Make all enemies follow player
-    console.log('enemies:', enemies.length)
     for (var i = 0; i < enemies.length; i++) {
         var enemy = enemies[i];
-        enemy.lookAt(this.player);
-        enemy.moveForward(Math.random());
+        var speed = 0;
+        if (player.distanceTo(enemy) < 200) {
+            enemy.lookAt(this.player);
+            speed = Math.random() * 1.0;
+        } else {
+            enemy.rotation += (Math.random() * 0.5) * (Math.random() > 0.5 ? +1 : -1);
+            speed = Math.random() * 0.2;
+        }
+        enemy.moveForward(speed);
     }
 
     // Keep player within bounds
