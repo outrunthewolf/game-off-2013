@@ -33,10 +33,10 @@ resizeGame();
 var player = new Zombie();
 player.x = 150;
 player.y = 150;
-player.width = 150;
-player.height = 150;
-player.setSourceFromUrl('assets/images/zombie.gif');
-player.color = "rgba(0, 127, 0, 0)";
+player.width = 32;
+player.height = 32;
+//player.setSourceFromUrl('assets/images/zombie.gif');
+player.color = "rgba(0, 127, 0, 200)";
 player.rotation = 0;
 player.bounds = worldBounds;
 Game.player = player;
@@ -100,10 +100,10 @@ Game.onEvent('enterframe', function() {
     HUD.y = 0 - Game.stage.offsetY;
 
     // Player Controls
-    if (this.keyDown[37]) this.player.rotation -= 5;
-    if (this.keyDown[39]) this.player.rotation += 5;
-    if (this.keyDown[38]) this.player.speed += 1;
-    if (this.keyDown[40]) this.player.speed *= .95;
+    if (this.keyDown[37]) this.player.rotation -= 3;
+    if (this.keyDown[39]) this.player.rotation += 3;
+    if (this.keyDown[38]) this.player.speed += 0.5;
+    if (this.keyDown[40]) this.player.speed *= .93;
     if (this.keyDown[32]) this.player.shoot();
 
     // Stage Controls
@@ -125,10 +125,12 @@ Game.onEvent('enterframe', function() {
         var speed = 0;
         if (player.distanceTo(enemy) < 200) {
             enemy.lookAt(this.player);
-            speed = Math.random() * 1.0;
+            speed = 0.3;
         } else {
-            enemy.rotation += (Math.random() * 0.5) * (Math.random() > 0.5 ? +1 : -1);
-            speed = Math.random() * 0.2;
+            if (Math.random() > 0.999) {
+                enemy.rotation += 45;
+            }
+            speed = 0.2;
         }
         enemy.moveForward(speed);
     }
