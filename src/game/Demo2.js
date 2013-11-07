@@ -42,8 +42,9 @@ function init(obj) {
 
 	// Set up manifest files
 	manifest = [
-		{src:"assets/images/stars.png", id:"stars"},
-		{src:"assets/images/ship.png", id:"ship"},
+		{src:"assets/images/grass.jpg", id:"grass"},
+		{src:"assets/images/zombie.gif", id:"zombie"},
+		{src:"assets/sound/tada.ogg", id:"music"},
 	];
 
 	// Create new stage
@@ -58,7 +59,9 @@ function init(obj) {
 
 	// Preloader
 	preloader = new createjs.LoadQueue(true);
+	preloader.installPlugin(createjs.Sound);
 	preloader.addEventListener("progress", handleProgress);
+	preloader.addEventListener("complete", handleComplete);
 	
 	// Load the manifest for any assets
 	preloader.loadManifest(manifest);
@@ -72,3 +75,16 @@ function handleProgress() {
 	message.text = "Loading " + (preloader.progress * 100 | 0) + "%";
 	stage.update();
 }
+
+// Lodaing complete
+function handleComplete() {
+	message.text = "Complete boy!";
+	stage.update();
+}
+
+
+/****
+*	
+*	PRELOADER SHIZZLE
+*
+****/
