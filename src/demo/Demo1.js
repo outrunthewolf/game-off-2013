@@ -33,10 +33,10 @@ resizeGame();
 var player = new Zombie();
 player.x = 150;
 player.y = 150;
-player.width = 150;
-player.height = 150;
-player.setSourceFromUrl('assets/images/zombie.gif');
-player.color = "rgba(0, 127, 0, 0)";
+player.width = 32;
+player.height = 32;
+//player.setSourceFromUrl('assets/images/zombie.gif');
+player.color = "rgba(0, 0, 127, 200)";
 player.rotation = 0;
 player.bounds = worldBounds;
 Game.player = player;
@@ -61,14 +61,15 @@ for (var i = 0; i < 5; i++) {
 // Events
 Game.onEvent('keydown', function(e) {
 //          console.log(e);
-    if (e.keyCode == 70) toggleFullscreen();
+//    if (e.keyCode == 70) toggleFullscreen();
     this.keyDown[e.keyCode] = true;
+    console.log(e.keyCode);
 });
 Game.onEvent('keyup', function(e) {
     this.keyDown[e.keyCode] = false;
 });
 Game.onEvent('mousemove', function(e) {
-
+    player.lookAt({x: e.pageX, y: e.pageY}, true);
 });
 
 // HUD
@@ -95,22 +96,30 @@ img.src = 'assets/images/grass.jpg';
 // Calculate Game Logic
 Game.onEvent('enterframe', function() {
 
-    //
+    // Align HUD to top right of scren
     HUD.x = 0 - Game.stage.offsetX;
     HUD.y = 0 - Game.stage.offsetY;
 
-    // Player Controls
-    if (this.keyDown[37]) this.player.rotation -= 5;
-    if (this.keyDown[39]) this.player.rotation += 5;
-    if (this.keyDown[38]) this.player.speed += 1;
-    if (this.keyDown[40]) this.player.speed *= .95;
+    // Player Movement (arrows)
+    if (this.keyDown[37]) this.player.rotation -= 3;
+    if (this.keyDown[39]) this.player.rotation += 3;
+    if (this.keyDown[38]) this.player.speed += 0.5;
+    if (this.keyDown[40]) this.player.speed *= .93;
+
+    // Player Movement (wasd)
+    if (this.keyDown[65]) this.player.x -= 2;
+    if (this.keyDown[68]) this.player.x += 2;
+    if (this.keyDown[87]) this.player.y -= 2;
+    if (this.keyDown[83]) this.player.y += 2;
+
+    // Shoot
     if (this.keyDown[32]) this.player.shoot();
 
     // Stage Controls
-    if (this.keyDown[87]) this.stage.offsetY += 10;
-    if (this.keyDown[83]) this.stage.offsetY -= 10;
-    if (this.keyDown[65]) this.stage.offsetX += 10;
-    if (this.keyDown[68]) this.stage.offsetX -= 10;
+    // if (this.keyDown[87]) this.stage.offsetY += 10;
+    // if (this.keyDown[83]) this.stage.offsetY -= 10;
+    // if (this.keyDown[65]) this.stage.offsetX += 10;
+    // if (this.keyDown[68]) this.stage.offsetX -= 10;
 
     // Update player speed to move
     this.player.speed *= this.player._deccel;
@@ -125,12 +134,19 @@ Game.onEvent('enterframe', function() {
         var speed = 0;
         if (player.distanceTo(enemy) < 200) {
             enemy.lookAt(this.player);
-            speed = Math.random() * 1.0;
+            speed = 0.3;
         } else {
-            enemy.rotation += (Math.random() * 0.5) * (Math.random() > 0.5 ? +1 : -1);
-            speed = Math.random() * 0.2;
+            if (Math.random() > 0.999) {
+                enemy.rotation += 45;
+            }
+            speed = 0.2;
         }
         enemy.moveForward(speed);
+    }
+
+    // Shoot
+    if (Game.mouseIsDown) {
+        player.shoot();
     }
 
     // Keep player within bounds
