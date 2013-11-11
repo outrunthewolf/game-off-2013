@@ -27,6 +27,7 @@ var Stage = {
 };
 
 
+
 /****
 *	
 *	PRELOADER SHIZZLE
@@ -81,10 +82,3 @@ function handleComplete() {
 	message.text = "Complete boy!";
 	stage.update();
 }
-
-
-/****
-*	
-*	PRELOADER SHIZZLE
-*
-****/
