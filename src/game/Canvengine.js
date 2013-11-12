@@ -27,8 +27,8 @@ var Canvengine = new BaseClass({
 		this.stage = this.createStage("main");
 
 		// Set up the on enter frame doohicky, with a nice framerate
-		//var Ticker = new createjs.Ticker();
-		///Ticker.on("tick", this.render, this);
+		createjs.Ticker.setFPS = this.fps;
+		createjs.Ticker.addEventListener("tick", this.render);
 	},
 	
 	// Create a new stage, all canvas's are added to the same element,
@@ -51,7 +51,7 @@ var Canvengine = new BaseClass({
 	},
 
 	// Clear all children from a specific stage?
-	// Not sure bout this, keep thinking nigga
+	// Not sure bout this, keep thinking 
 	clearStageChildren: function(id) {
 
 
@@ -59,7 +59,7 @@ var Canvengine = new BaseClass({
 
 	// Render function
 	render: function() {
-
+		//console.log('nyah');
 		return false;
 		
 		// Loop through all canvas's and collect the children!!
@@ -82,8 +82,7 @@ var Canvengine = new BaseClass({
 		// we can re-render that particular canvas with somethin aling the lines of
 		// child[i].stage.update();
 		//
-		// Dont forget we can pause the ticker if needs be
-		// or whatever...
+		// Dont forget we can pause the ticker i think
 		this.opf = 0;
 		for (var i = 0, l = childs.length; i < l; i++) {
 			var child = childs[i];
@@ -173,5 +172,5 @@ var Canvengine = new BaseClass({
 				+ '<br/>Background Offset: ' + ox + ', ' + oy
 				+ '';
 		}	
-	}
+	},
 });

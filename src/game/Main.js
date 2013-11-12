@@ -6,7 +6,12 @@
 document.addEventListener('DOMContentLoaded',function()
 {
 	var Game = new Canvengine({
-		container: "stage"
+		container: "stage",
+		manifest = [
+			{src:"assets/images/grass.jpg", id:"grass"},
+			{src:"assets/images/zombie.gif", id:"zombie"},
+			{src:"assets/sound/tada.ogg", id:"music"},
+		];
 	});
 
 });
