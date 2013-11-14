@@ -12,7 +12,10 @@ document.addEventListener('DOMContentLoaded',function()
 			{src:"assets/images/grass.jpg", id:"grass"},
 			{src:"assets/images/zombie.gif", id:"zombie"},
 			{src:"assets/sound/tada.ogg", id:"music"},
-		]
+		],
+		fps: 30,
+		width: 400,
+		height: 200
 	});
 
 });

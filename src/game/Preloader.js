@@ -5,16 +5,33 @@
 **/
 var Preloader = new BaseClass({
 
+	height: 10,
+	padding: 10, // percentage?
+	xpos: null,
+	ypos: null,
+	barLimit: null,
+	main: null,
+
 	init: function(main) {
 		
+		this.main = main;
+
 		// Create new preloader
 		this.stage = main.createStage("preloader");
 
 		// Add a preloader to the stage
 		this.loadBar = new createjs.Shape();
-		this.loadBar.graphics.beginFill("#ff0000").drawRect(0, 0, 10, 10);
-		this.loadBar.x = 20;
-		this.loadBar.y = 30;
+		this.loadBar.graphics.beginFill("#ff0000").drawRect(0, 0, 0, this.height);
+
+		// Calculate some dimensions, we always want the preloader just off the bottom
+		this.xpos = 10;//main.width - (this.padding / 100) * main.width;
+		this.ypos = 20;//(main.height - (this.padding / 100) * main.height) - this.height;
+		this.barLimit = (main.width - (this.padding * 2));
+
+		this.loadBar.x = this.xpos;
+		this.loadBar.y = this.ypos;
+		console.log(this.ypos);
+		console.log(this.xpos);
 
 		// Add to stage
 		this.stage.addChild(this.loadBar);
@@ -47,14 +64,18 @@ var Preloader = new BaseClass({
 	// Handle a file load
 	handleProgress: function() {
 		this.loadBar.graphics.clear();
-		var w = (this.preloader.progress * 100 | 0);
-		this.loadBar.graphics.beginFill("#ff0000").drawRect(0, 0, w, 10);
+		var pc = (this.preloader.progress * this.barLimit) ;
+		
+		this.loadBar.graphics.beginFill("#ff0000").drawRect(this.padding, 0, pc, 10);
+		this.loadBar.width = pc;
+		
 		this.stage.update();
 	},
 
 	// Lodaing complete
 	handleComplete: function() {
-		this.stage.update();
+		this.main.clearStage('preloader');
+		this.main.stage.dispatchEvent("preloaderComplete");
 	}
 
 });

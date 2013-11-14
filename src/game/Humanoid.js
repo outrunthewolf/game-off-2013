@@ -20,6 +20,24 @@ var Humanoid = new BaseClass({
     shield: 100,
 
     bullets: [],
+    stage: null,
+
+    init: function(main) {
+
+        var player = new createjs.Shape();
+        player.graphics.beginFill("#ffffff").drawRect(0, 0, 2, 2);
+        
+        player.x = 150;
+        player.y = 150;
+
+        player.width = 2;
+        player.height = 2;
+
+        //player.rotation = 0;
+       // player.bounds = worldBounds;
+
+        return player;
+    },
 
     // Movement Controls
     thrust: function() {
@@ -58,6 +76,10 @@ var Humanoid = new BaseClass({
         this.speedY = Math.round(Math.sin(this.rotation * (Math.PI / 180)) * this.speed);
         this.x -= this.speedX;
         this.y += this.speedY;
+    },
+
+    die: function() {
+
     }
 
 });
